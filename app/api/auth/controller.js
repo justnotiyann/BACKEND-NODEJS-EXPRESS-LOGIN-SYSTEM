@@ -27,3 +27,27 @@ exports.getAllUsers = async (req, res, next) => {
     console.log(e);
   }
 };
+
+exports.signIn = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    const result = await Users.findOne({ email });
+    if (!result) {
+      res.status(400).json({ msg: "invalid credentials" });
+    } else {
+      const isMatch = await argon2.verify(password, result.password);
+
+      if (!isMatch) {
+        res.status(400).json({ msg: "invalid credentials" });
+      } else {
+        req.session.id = result._id;
+        req.session.role = result.role;
+        req.session.login = true;
+        res.status(200).json({ msg: "succes login" });
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
