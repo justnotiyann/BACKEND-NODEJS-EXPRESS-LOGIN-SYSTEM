@@ -1,9 +1,29 @@
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const app = express();
 
-var app = express();
+// session
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
+
+const store = new MongoDBStore({
+  uri: "mongodb://127.0.0.1/backend-nodejs-express-login-system",
+  collection: "sessionStoreCollection",
+});
+
+app.use(
+  require("express-session")({
+    secret: "This is a secret",
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    },
+    store: store,
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 
 app.use(logger("dev"));
 app.use(express.json());
