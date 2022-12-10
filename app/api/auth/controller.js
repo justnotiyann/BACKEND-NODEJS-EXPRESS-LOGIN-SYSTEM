@@ -14,20 +14,6 @@ exports.createUser = async (req, res, next) => {
     console.log(e);
   }
 };
-
-exports.getAllUsers = async (req, res, next) => {
-  try {
-    const result = await Users.find().select("_id email");
-
-    if (!result) res.status(500).json({ msg: "server error" });
-    res
-      .status(200)
-      .json({ msg: "here all account registered on server", data: result });
-  } catch (e) {
-    console.log(e);
-  }
-};
-
 exports.signIn = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -36,7 +22,7 @@ exports.signIn = async (req, res, next) => {
     if (!result) {
       res.status(400).json({ msg: "invalid credentials" });
     } else {
-      const isMatch = await argon2.verify(password, result.password);
+      const isMatch = await argon2.verify(result.password, password);
 
       if (!isMatch) {
         res.status(400).json({ msg: "invalid credentials" });
@@ -47,6 +33,18 @@ exports.signIn = async (req, res, next) => {
         res.status(200).json({ msg: "succes login" });
       }
     }
+  } catch (e) {
+    console.log(e);
+  }
+};
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const result = await Users.find().select("_id email");
+
+    if (!result) res.status(500).json({ msg: "server error" });
+    res
+      .status(200)
+      .json({ msg: "here all account registered on server", data: result });
   } catch (e) {
     console.log(e);
   }
